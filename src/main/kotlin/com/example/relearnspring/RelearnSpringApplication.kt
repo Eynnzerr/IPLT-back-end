@@ -8,6 +8,8 @@ import org.springframework.boot.runApplication
 @MapperScan(basePackages = ["com.example.relearnspring.mapper"])
 class RelearnSpringApplication
 
+// This is a small project, so I don't follow the standard architecture of a backend project.
+// e.g. I removed service layer, and let controllers directly hold the DAO.
 fun main(args: Array<String>) {
     runApplication<RelearnSpringApplication>(*args)
 }
