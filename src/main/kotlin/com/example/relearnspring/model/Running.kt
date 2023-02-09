@@ -16,8 +16,8 @@ data class Running(
     val gyroscopey: Int,
     val gyroscopez: Int,
     val stay: Int,
-    val timeStamp: Long,
-    val bs_address: Int,
+    val timestamp: Long,
+    val bsAddress: Int,
     val sampleTime: String,
     val sampleBatch: Int
 )

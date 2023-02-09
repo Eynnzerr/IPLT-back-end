@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>relearnSpring</artifactId>
+    <artifactId>relearnspring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>relearnSpring</name>
-    <description>relearnSpring</description>
+    <name>relearnspring</name>
+    <description>relearnspring</description>
     <properties>
         <java.version>17</java.version>
         <kotlin.version>1.6.21</kotlin.version>
@@ -88,6 +88,13 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>3.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

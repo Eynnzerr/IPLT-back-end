@@ -16,7 +16,7 @@ class TokenInterceptor: HandlerInterceptor {
 
         val token = request.getHeader("token")
         if (token == null) {
-            response.writer.write(JacksonUtils.toJson(HttpResponse.fail(-1, "No token found in request header..")))
+            response.writer.write(JacksonUtils.toJson(HttpResponse.fail(-1, "No token found in request header.")))
             return false
         }
         if (JwtUtils.checkIfExpired(token)) {

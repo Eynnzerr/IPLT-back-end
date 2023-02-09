@@ -6,8 +6,8 @@ data class HttpResponse(
     val data: Any?
 ) {
     companion object {
-        fun success(msg: String) = HttpResponse(0, msg, null)
-        fun success(msg: String, data: Any) = HttpResponse(0, msg, data)
+        fun success(msg: String) = HttpResponse(200, msg, null)
+        fun success(msg: String, data: Any) = HttpResponse(200, msg, data)
         fun fail(code: Int, msg: String) = HttpResponse(code, msg, null)
     }
 }

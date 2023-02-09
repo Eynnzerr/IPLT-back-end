@@ -1,9 +1,14 @@
 spring:
   datasource:
+    # url: jdbc:mysql://10.0.4.15:3306/iplt?characterEncoding=utf8&serverTimezone=UTC
     url: jdbc:mysql://localhost:3306/iplt?characterEncoding=utf8&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
+    username: root  # iplt
     password: 020226cp
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 mybatis:
   configuration:
