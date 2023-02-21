@@ -92,10 +92,29 @@ class PositionController {
 
     @PostMapping("/upload")
     fun receiveFile(fileBytes: FileBytes): HttpResponse {
-        println("接收文件名：${fileBytes.name} 文件比特：${fileBytes.multipartFile.bytes}")
-        File(fileBytes.name).apply {
+        // println("接收文件名：${fileBytes.name} 文件比特：${fileBytes.multipartFile.bytes}")
+        val file = File(fileBytes.name).apply {
             writeBytes(fileBytes.multipartFile.bytes)
         }
-        return HttpResponse.success("连接正常")
+        val positions = file.readLines()
+            .drop(1)
+            .map {
+                // Bug:由于split取了逗号，导致sample_time被从中间截断，解析失败
+                val fields = it.split(",")
+                Position(
+                    id = fields[0].toInt(),
+                    address = fields[1],
+                    x = fields[2].toFloat(),
+                    y = fields[3].toFloat(),
+                    z = fields[4].toFloat(),
+                    stay = fields[5].toInt(),
+                    timestamp = fields[6].toLong(),
+                    bsAddress = fields[7].toInt(),
+                    sampleTime = fields[8].drop(1) + "," + fields[9].dropLast(1),
+                    sampleBatch = fields[10].toInt()
+                )
+            }
+        val count = positionMapper.insertCsv(positions)
+        return if (count > 0) HttpResponse.success("csv上传成功") else HttpResponse.fail(-1, "csv上传失败：未能导入数据库")
     }
 }

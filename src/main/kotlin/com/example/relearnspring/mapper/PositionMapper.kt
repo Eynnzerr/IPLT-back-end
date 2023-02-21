@@ -1,7 +1,9 @@
 package com.example.relearnspring.mapper
 
 import com.example.relearnspring.model.Position
+import com.example.relearnspring.utils.DaoProvider
 import org.apache.ibatis.annotations.Delete
+import org.apache.ibatis.annotations.InsertProvider
 import org.apache.ibatis.annotations.Param
 import org.apache.ibatis.annotations.Select
 import org.apache.ibatis.annotations.Update
@@ -35,4 +37,15 @@ interface PositionMapper {
 
     @Delete("DELETE FROM position WHERE id = #{id}")
     fun deleteById(id: Int): Int
+
+//    @Insert(
+//        "<script>",
+//        "INSERT INTO position (address, x, y, z, stay, timestamp, bs_address, sample_time, sample_batch) VALUES",
+//        "<foreach collection='list', item='item', separator=','>",
+//        "(#{item.address}, #{item.x}, #{item.y}, #{item.z}, #{item.stay}, #{item.bsAddress}, #{item.sampleTime}, #{item.sampleBatch})",
+//        "</foreach>",
+//        "</script>"
+//    )
+    @InsertProvider(type = DaoProvider::class, method = "insertAllPos")
+    fun insertCsv(@Param("list") positions: List<Position>): Int
 }

@@ -14,4 +14,5 @@ data class Position(
     val bsAddress: Int,
     val sampleTime: String,
     val sampleBatch: Int
-)
+) {
+}
