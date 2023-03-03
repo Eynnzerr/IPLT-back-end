@@ -3,13 +3,10 @@
 package com.example.relearnspring.controller
 
 import com.example.relearnspring.mapper.RunningMapper
+import com.example.relearnspring.model.FileBytes
 import com.example.relearnspring.model.HttpResponse
 import com.example.relearnspring.model.Running
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiImplicitParam
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.io.File
 
 @Api(
     tags = ["Running数据请求"],
@@ -60,7 +58,6 @@ class RunningController {
     )
     @GetMapping("/batch")
     fun getRunByBatch(@RequestParam(value = "batch", defaultValue = "27") batch: Int): HttpResponse {
-        print("Receive a request for batch selecting.")
         val list = runningMapper.getRunByBatch(batch)
         return if (list.isNotEmpty()) HttpResponse.success("OK", list)
         else HttpResponse.fail(-1, "No corresponding data.")
@@ -96,4 +93,43 @@ class RunningController {
     @GetMapping("/delete")
     fun deleteById(@RequestParam(value = "id", defaultValue = "-1") id: Int) = if (runningMapper.deleteById(id) > 0) HttpResponse.success("OK")
     else HttpResponse.fail(-1, "Failed to delete data of id $id")
+
+    @ApiOperation("上传csv文件并存入running数据库")
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "name", value = "文件名", defaultValue = "-1", required = true, paramType = "form"),
+        ApiImplicitParam(name = "multipartFile", value = "文件字节流", defaultValue = "null", required = true, paramType = "form")
+    )
+    @ApiResponses(
+        ApiResponse(code = 200, message = "上传成功"),
+        ApiResponse(code = -1, message = "上传失败"),
+    )
+    @PostMapping("/upload")
+    fun receiveFile(fileBytes: FileBytes): HttpResponse {
+        // println("接收文件名：${fileBytes.name} 文件比特：${fileBytes.multipartFile.bytes}")
+        val file = File(fileBytes.name).apply {
+            writeBytes(fileBytes.multipartFile.bytes)
+        }
+        val runnings = file.readLines()
+            .drop(1)
+            .map {
+                val fields = it.split(",")
+                Running(
+                    id = fields[0].toInt(),
+                    address = fields[1],
+                    accx = fields[8].toInt(),
+                    accy = fields[9].toInt(),
+                    accz = fields[10].toInt(),
+                    gyroscopex = fields[11].toInt(),
+                    gyroscopey = fields[12].toInt(),
+                    gyroscopez = fields[13].toInt(),
+                    stay = fields[14].toInt(),
+                    timestamp = fields[17].toLong(),
+                    bsAddress = fields[18].toInt(),
+                    sampleTime = fields[19].drop(1) + "," + fields[20].dropLast(1),
+                    sampleBatch = fields[21].toInt()
+                )
+            }
+        val count = runningMapper.insertCsv(runnings)
+        return if (count > 0) HttpResponse.success("csv上传成功") else HttpResponse.fail(-1, "csv上传失败：未能导入数据库")
+    }
 }

@@ -23,7 +23,7 @@ class TokenInterceptor: HandlerInterceptor {
             response.writer.write(JacksonUtils.toJson(HttpResponse.fail(-1, "Token has expired.")))
             return false
         }
-        println("Receive valid token from user: ${JwtUtils.decode(token)}")
+        // println("Receive valid token from user: ${JwtUtils.decode(token)}")
         return true
     }
 }

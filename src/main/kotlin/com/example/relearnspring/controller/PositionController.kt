@@ -53,7 +53,6 @@ class PositionController {
     )
     @GetMapping("/batch")
     fun getPosByBatch(@RequestParam(value = "batch", defaultValue = "27") batch: Int): HttpResponse {
-        print("Receive a request for batch selecting.")
         val list = positionMapper.getPosByBatch(batch)
         return if (list.isNotEmpty()) HttpResponse.success("OK", list)
             else HttpResponse.fail(-1, "No corresponding data.")
@@ -90,6 +89,15 @@ class PositionController {
     fun deleteById(@RequestParam(value = "id", defaultValue = "-1") id: Int) = if (positionMapper.deleteById(id) > 0) HttpResponse.success("OK")
     else HttpResponse.fail(-1, "Failed to delete data of id $id")
 
+    @ApiOperation("上传csv文件并存入position数据库")
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "name", value = "文件名", defaultValue = "-1", required = true, paramType = "form"),
+        ApiImplicitParam(name = "multipartFile", value = "文件字节流", defaultValue = "null", required = true, paramType = "form")
+    )
+    @ApiResponses(
+        ApiResponse(code = 200, message = "上传成功"),
+        ApiResponse(code = -1, message = "上传失败"),
+    )
     @PostMapping("/upload")
     fun receiveFile(fileBytes: FileBytes): HttpResponse {
         // println("接收文件名：${fileBytes.name} 文件比特：${fileBytes.multipartFile.bytes}")
@@ -101,6 +109,7 @@ class PositionController {
             .map {
                 // Bug:由于split取了逗号，导致sample_time被从中间截断，解析失败
                 val fields = it.split(",")
+                println(fields)
                 Position(
                     id = fields[0].toInt(),
                     address = fields[1],
@@ -108,10 +117,10 @@ class PositionController {
                     y = fields[3].toFloat(),
                     z = fields[4].toFloat(),
                     stay = fields[5].toInt(),
-                    timestamp = fields[6].toLong(),
-                    bsAddress = fields[7].toInt(),
-                    sampleTime = fields[8].drop(1) + "," + fields[9].dropLast(1),
-                    sampleBatch = fields[10].toInt()
+                    timestamp = fields[9].toLong(),
+                    bsAddress = fields[10].toInt(),
+                    sampleTime = fields[11].drop(1) + "," + fields[12].dropLast(1),
+                    sampleBatch = fields[13].toInt()
                 )
             }
         val count = positionMapper.insertCsv(positions)

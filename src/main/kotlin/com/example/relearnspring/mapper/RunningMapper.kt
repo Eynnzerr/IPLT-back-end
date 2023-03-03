@@ -1,9 +1,8 @@
 package com.example.relearnspring.mapper
 
 import com.example.relearnspring.model.Running
-import org.apache.ibatis.annotations.Delete
-import org.apache.ibatis.annotations.Select
-import org.apache.ibatis.annotations.Update
+import com.example.relearnspring.utils.DaoProvider
+import org.apache.ibatis.annotations.*
 
 interface RunningMapper {
     @Select("SELECT * FROM running limit 10")
@@ -37,4 +36,7 @@ interface RunningMapper {
 
     @Delete("DELETE FROM running WHERE id = #{id}")
     fun deleteById(id: Int): Int
+
+    @InsertProvider(type = DaoProvider::class, method = "insertAllRun")
+    fun insertCsv(@Param("list") positions: List<Running>): Int
 }
